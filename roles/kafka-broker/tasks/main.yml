@@ -11,7 +11,7 @@
   file: path="{{ kafka.broker.install }}" state=directory
 - name: Download kafka
   get_url:
-    url: "{{kafka.broker.downloadurl}}"/apache-dist-archive/kafka/1.0.0/kafka_2.11-1.0.0.tgz
+    url: "{{kafka.broker.downloadurl}}/apache-dist-archive/kafka/1.0.0/kafka_2.11-1.0.0.tgz"
     dest: "{{ kafka.broker.install }}/kafka_2.11-1.0.0.tgz"
     mode: 0666
 - name: Extract kafka.tgz into install
