@@ -1,0 +1,22 @@
+all:
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_user: akaushal
+    ansible_become: true
+    #security_mode: plain
+preflight:
+  hosts:
+    #zkIps
+    #kafkaIps
+disk-mount-zk:
+  hosts:  
+    #zkIps  
+zookeeper:
+  hosts:
+    #zkIps
+disk-mount-kafka:
+  hosts:  
+    #kafkaIps:    
+broker:
+  hosts:
+    #kafkahosts

@@ -1,0 +1,21 @@
+- name: Managed Instance Group 
+  hosts: localhost
+  gather_facts: False
+  vars:
+     service_account_email: <Enter Acct details> 
+     gcp_cred_file: <Cred file path>
+     gcp_project: <project>
+     gcp_cred_kind: serviceaccount
+     region: "us-east4"
+     
+  tasks:
+    - name: Create Managed Instance Group
+      gce_mig:
+        name: bk-ms-kafka-grp
+        zone: "{{ zone }}"
+        state: present
+        size: 1
+        template: ms-kafka-template-1
+        autoscaling:
+          enabled: no
+          

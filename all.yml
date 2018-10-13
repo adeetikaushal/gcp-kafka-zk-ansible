@@ -1,0 +1,22 @@
+- hosts: preflight
+  tasks:
+  - import_role:
+      name: preflight
+    tags:
+      - pre-install
+- hosts: disk-mount-zk
+  tasks:
+  - import_role:
+      name: disk-mount-zk
+- hosts: zookeeper
+  tasks:
+  - import_role:
+      name: zookeeper
+- hosts: disk-mount-kafka
+  tasks:
+  - import_role:
+      name: disk-mount-kafka
+- hosts: broker
+  tasks:
+  - import_role:
+      name: kafka-broker

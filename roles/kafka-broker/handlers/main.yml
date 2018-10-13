@@ -1,0 +1,13 @@
+- name: reload systemd
+  command: systemctl daemon-reload
+  
+- name: stop kafka
+  systemd:
+    name: "{{kafka.broker.service_name}}"
+    state: stopped
+    
+- name: start kafka
+  systemd:
+    name: "{{kafka.broker.service_name}}"
+    state: started
+            

@@ -1,0 +1,20 @@
+[Unit]
+Description=Apache Kafka server (broker)
+Documentation=http://kafka.apache.org/documentation.html
+After=network.target 
+
+[Service]
+Type=simple
+PIDFile={{kafka.broker.install }}/kafka.pid
+Environment=JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk
+Environment=KAFKA_LOG4J_OPTS=-Dlog4j.configuration=file:{{ kafka.broker.install }}/kafka/config/log4j.properties
+Environment=JMX_PORT={{kafka.broker.jmx_port }}
+ExecStart={{kafka.broker.install }}/kafka/bin/kafka-server-start.sh {{ kafka.broker.install }}/kafka/config/server.properties
+ExecStop={{kafka.broker.install }}/kafka/bin/kafka-server-stop.sh
+Restart=on-failure
+RemainAfterExit=yes
+User=root
+Group={{kafka.broker.user}}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,35 @@
+- name: Create a ext4 filesystem on /dev/sdb
+  filesystem:
+    fstype: ext4
+    dev: /dev/sdb
+
+- name: Create directory /install
+  file:
+    path: /install
+    state: directory
+
+- name: Mount install read-write
+  mount:
+    path: /install
+    opts: rw
+    state: mounted
+    src: /dev/sdb
+    fstype: ext4
+
+- name: Create a ext4 filesystem on /dev/sdc
+  filesystem:
+    fstype: ext4
+    dev: /dev/sdc
+
+- name: Create directory /data
+  file:
+    path: /data
+    state: directory
+
+- name: Mount install read-write
+  mount:
+    path: /data
+    opts: rw
+    state: mounted  
+    src: /dev/sdc
+    fstype: ext4  

@@ -1,0 +1,99 @@
+- name: broker group
+  group:
+    name: "{{kafka.broker.group}}"
+- name: broker user
+  user:
+    name: "{{kafka.broker.user}}"
+    comment: "Kafka User"
+    system: yes
+    group: "{{kafka.broker.group}}"
+- name: Create Directory
+  file: path="{{ kafka.broker.install }}" state=directory
+- name: Download kafka
+  get_url:
+    url: "{{kafka.broker.downloadurl}}"/apache-dist-archive/kafka/1.0.0/kafka_2.11-1.0.0.tgz
+    dest: "{{ kafka.broker.install }}/kafka_2.11-1.0.0.tgz"
+    mode: 0666
+- name: Extract kafka.tgz into install
+  unarchive:
+    src: "{{ kafka.broker.install }}/kafka_2.11-1.0.0.tgz"
+    dest: "{{ kafka.broker.install }}"
+    remote_src: yes  
+
+- file:
+    src: "{{ kafka.broker.install }}/kafka_2.11-1.0.0"
+    dest: "{{ kafka.broker.install }}/kafka"
+    owner: "{{kafka.broker.user}}"
+    group: "{{kafka.broker.group}}"
+    state: link
+
+- name: create broker data directories
+  file:
+    path: "{{item}}"
+    owner: "{{kafka.broker.user}}"
+    group: "{{kafka.broker.group}}"
+    state: directory
+    mode: 0777
+    recurse: yes   
+  with_items: "{{kafka.broker.datadir}}"
+
+- name: Create Directory for pid 
+  file: 
+    path: /var/lib/kafka 
+    state: directory  
+    owner: "{{ kafka.broker.user }}"
+    group: "{{ kafka.broker.group }}"  
+    recurse: yes    
+
+- name: Create Directory for log 
+  file: 
+    path: "{{ kafka.broker.install }}/kafka/logs" 
+    state: directory  
+    owner: "{{ kafka.broker.user }}"
+    group: "{{ kafka.broker.group }}"  
+    recurse: yes   
+
+- name: Broker plaintext config
+  template:
+    src: server.properties.j2
+    dest: "{{kafka.broker.config_file}}"
+    mode: 0640
+    owner: "{{kafka.broker.user}}"
+    group: "{{kafka.broker.group}}"
+ 
+- name: Remove Lost+found dir from install
+  file: 
+    path: "{{ kafka.broker.install }}/lost+found/" 
+    state: absent   
+
+- name: Remove Lost+found dir from data 
+  file: 
+    path: /data/lost+found/
+    state: absent       
+    
+- name: Changed Permissions
+  file: 
+    path: "{{ kafka.broker.install }}"
+    state: directory  
+    owner: "{{ kafka.broker.user }}"
+    group: "{{ kafka.broker.group }}"  
+    mode: 0777 
+    recurse: yes   
+   
+- name: create environment variables
+  template:
+    src: environment.j2
+    dest: "{{kafka.broker.systemd_file}}/{{kafka.broker.service_name}}.service"
+    mode: 0664
+    owner: "{{kafka.broker.user}}"
+    group: "{{kafka.broker.group}}"
+  notify:
+    - reload systemd
+    - stop kafka
+    - start kafka
+    
+- name: broker configure service
+  systemd:
+    name: "{{kafka.broker.service_name}}"
+    enabled: "{{kafka.broker.systemd.enabled}}"
+    state: "{{kafka.broker.systemd.state}}"

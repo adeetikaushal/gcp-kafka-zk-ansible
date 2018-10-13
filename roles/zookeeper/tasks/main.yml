@@ -1,0 +1,81 @@
+- name: zookeeper create group
+  group:
+    name: "{{zookeeper.group}}"
+- name: zookeeper create user
+  user:
+    name: "{{zookeeper.user}}"
+    comment: "Zookeeper User"
+    system: yes
+    group: "{{zookeeper.group}}"
+- name: Create Directory for install
+  file: 
+    path: "{{ zookeeper.install }}"
+    state: directory
+- name: Create Directory for data 
+  file: 
+    path: /var/lib/zookeeper 
+    state: directory  
+    owner: "{{ zookeeper.user }}"
+    group: "{{ zookeeper.group }}"  
+    recurse: yes      
+    
+- name: Download ZK
+  get_url:
+    url:  "{{zookeeper.downloadurl}}/apache-dist-archive/zookeeper/zookeeper-3.4.9/zookeeper-3.4.9.tar.gz"
+    dest: "{{ zookeeper.install }}/zookeeper-3.4.9.tar.gz"
+    mode: 0666
+
+- name: Extract zk.tgz into install
+  unarchive:
+    src: "{{ zookeeper.install }}/zookeeper-3.4.9.tar.gz"
+    dest: "{{ zookeeper.install }}"
+    remote_src: yes
+
+- name: Create link
+  file:
+    src: "{{ zookeeper.install }}/zookeeper-3.4.9"
+    dest: "{{ zookeeper.install }}/zookeeper"
+    owner: "{{ zookeeper.user }}"
+    group: "{{ zookeeper.group }}"
+    state: link
+    
+- name: zookeeper myid file
+  template:
+    src: myid.j2
+    dest: "{{zookeeper.config.dataDir}}/myid"
+    mode: 0555
+    owner: "{{zookeeper.user}}"
+    group: "{{zookeeper.group}}"
+
+- name: zookeeper create config
+  template:
+    src: zookeeper.properties.j2
+    dest: "{{zookeeper.config_file}}"
+    mode: 0400
+    owner: "{{zookeeper.user}}"
+    group: "{{zookeeper.group}}"
+
+- name: Change permission
+  file: 
+    dest: "{{ zookeeper.install }}"
+    owner: "{{zookeeper.user}}"
+    group: "{{zookeeper.group}}"
+    mode: 0775 
+    recurse: yes
+
+- name: create environment variables
+  template:
+    src: environment.j2
+    dest: "{{zookeeper.systemd_file}}/{{zookeeper.service_name}}.service"
+    mode: 0664
+    owner: "{{zookeeper.user}}"
+    group: "{{zookeeper.group}}"
+  notify:
+    - reload systemd
+    - restart zookeeper
+    
+- name: zookeeper configure service
+  systemd:
+    name: "{{zookeeper.service_name}}"
+    enabled: "{{zookeeper.systemd.enabled}}"
+    state: "{{zookeeper.systemd.state}}"

@@ -1,0 +1,57 @@
+kafka: 
+  broker:
+    downloadurl: <Add downloadurl>
+    user: kafka
+    group: kafka
+    install: /install
+    config_file: /install/kafka/config/server.properties
+    #systemd_file: /usr/lib/systemd/system
+    #systemd_link: /etc/systemd/system/multi-user.target.wants
+    #systemd_file: /usr/lib/systemd/system/kafka.service
+    systemd_file: /etc/systemd/system
+    service_name: kafka
+    jmx_port: 11061
+    datadir:
+      - /data
+    systemd:
+      enabled: yes
+      state: started
+    environment:
+      KAFKA_HEAP_OPTS: "-Xmx1g"
+    config:
+      delete.topic.enable: true
+      auto.create.topics.enable: false
+      unclean.leader.election.enable: false
+      controlled.shutdown.enable: true
+      controlled.shutdown.max.retries: 3
+      controlled.shutdown.retry.backoff.ms: 5000
+      default.replication.factor: 3
+      offsets.topic.num.partitions: 200
+      offsets.topic.replication.factor: 3
+      offsets.retention.check.interval.ms: 600000
+      offsets.commit.timeout.ms: 5000
+      num.network.threads: 8
+      num.replica.fetchers: 2
+      num.io.threads: 8
+      socket.send.buffer.bytes: 8388608
+      socket.receive.buffer.bytes: 8388608
+      socket.request.max.bytes: 104857600
+      log.retention.days: 7
+      log.retention.bytes: 1573741824000
+      log.segment.bytes: 536870912
+      log.cleanup.policy: delete
+      zookeeper.connection.timeout.ms: 50000
+      zookeeper.session.timeout.ms: 50000
+      zookeeper.sync.time.ms: 2000
+      queued.max.requests: 500
+      replica.lag.time.max: 10000
+      replica.fetch.wait.max.ms: 500
+      min.insync.replicas: 2
+      replica.fetch.max.bytes: 2097152
+      message.max.bytes: 2097152
+      replica.high.watermark.checkpoint.interval.ms: 5000
+      replica.socket.timeout.ms: 30000
+      replica.socket.receive.buffer.bytes: 65536
+      log.flush.interval.ms: 5000
+      controller.socket.timeout.ms: 12000
+      request.timeout.ms: 12000
